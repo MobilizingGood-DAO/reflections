@@ -43,10 +43,11 @@ export default function ReflectionJournal() {
                   blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
                 }]
               });
-            } catch (addError) {
-              alert('❌ Failed to add GOOD L1 Testnet to MetaMask.');
-              return;
-            }
+           } catch {
+  alert('Failed to add GOOD L1 Testnet to MetaMask.');
+  return;
+}
+
           } else {
             alert('❌ Please switch to GOOD L1 Testnet manually.');
             return;
