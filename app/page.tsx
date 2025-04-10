@@ -26,8 +26,7 @@ export default function ReflectionJournal() {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: CHAIN_ID_HEX }]
           });
-        } catch (switchError) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch {
           try {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
@@ -43,7 +42,7 @@ export default function ReflectionJournal() {
                 blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
               }]
             });
-          } catch (addError) {
+          } catch {
             alert('Failed to add GOOD L1 Testnet to MetaMask.');
             return;
           }
