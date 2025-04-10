@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 
 const CONTRACT_ADDRESS = '0x531dBA50F8198B1Cf15201c89DB7ed1E3C3F61a2';
 const CHAIN_ID = 48169;
-const CHAIN_ID_HEX = '0xBC29'; // 48169 in hex
+const CHAIN_ID_HEX = '0xBC29';
 const NFT_STORAGE_API_KEY = process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY!;
 
 export default function ReflectionJournal() {
@@ -27,29 +27,24 @@ export default function ReflectionJournal() {
             params: [{ chainId: CHAIN_ID_HEX }]
           });
         } catch (switchError) {
-          if (switchError.code === 4902) {
-            try {
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: CHAIN_ID_HEX,
-                  chainName: 'GOOD L1 Testnet',
-                  rpcUrls: ['https://subnets.avax.network/goodtest/testnet/rpc'],
-                  nativeCurrency: {
-                    name: 'GOOD',
-                    symbol: 'GOOD',
-                    decimals: 18
-                  },
-                  blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
-                }]
-              });
-           } catch {
-  alert('Failed to add GOOD L1 Testnet to MetaMask.');
-  return;
-}
-
-          } else {
-            alert('❌ Please switch to GOOD L1 Testnet manually.');
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: CHAIN_ID_HEX,
+                chainName: 'GOOD L1 Testnet',
+                rpcUrls: ['https://subnets.avax.network/goodtest/testnet/rpc'],
+                nativeCurrency: {
+                  name: 'GOOD',
+                  symbol: 'GOOD',
+                  decimals: 18
+                },
+                blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
+              }]
+            });
+          } catch (addError) {
+            alert('Failed to add GOOD L1 Testnet to MetaMask.');
             return;
           }
         }
