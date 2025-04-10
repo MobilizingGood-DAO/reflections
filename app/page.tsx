@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 const CONTRACT_ADDRESS = '0x531dBA50F8198B1Cf15201c89DB7ed1E3C3F61a2';
 const CHAIN_ID = 48169;
 const CHAIN_ID_HEX = '0xBC29'; // 48169 in hex
-const NFT_STORAGE_API_KEY = 'b2b22ff0.916669fd4e6f42d5aab07621c9137b54';
+const NFT_STORAGE_API_KEY = process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY!;
 
 export default function ReflectionJournal() {
   const [reflection, setReflection] = useState('');
