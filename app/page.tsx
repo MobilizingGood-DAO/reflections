@@ -20,9 +20,39 @@ export default function ReflectionJournal() {
       const signer = await provider.getSigner();
 
       const { chainId } = await provider.getNetwork();
-      if (chainId !== CHAIN_ID) {
-        return alert(`Please switch to GOOD L1 Testnet (Chain ID: ${CHAIN_ID})`);
+    if (chainId !== CHAIN_ID) {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0xBC29' }] // 48169 in hex
+    });
+  } catch (switchError) {
+    // This error code means the chain hasn't been added to MetaMask
+    if (switchError.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0xBC29',
+            chainName: 'GOOD L1 Testnet',
+            rpcUrls: ['https://subnets.avax.network/goodtest/testnet/rpc'],
+            nativeCurrency: {
+              name: 'GOOD',
+              symbol: 'GOOD',
+              decimals: 18
+            },
+            blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
+          }]
+        });
+      } catch (addError) {
+        alert('Failed to add GOOD L1 Testnet to MetaMask.');
       }
+    } else {
+      alert('Please switch to GOOD L1 Testnet (Chain ID: 48169).');
+    }
+  }
+}
+
 
       // Upload to IPFS via nft.storage
       setStatus('Uploading reflection to IPFS...');
