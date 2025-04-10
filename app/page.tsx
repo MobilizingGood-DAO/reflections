@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 
 const CONTRACT_ADDRESS = '0x531dBA50F8198B1Cf15201c89DB7ed1E3C3F61a2';
 const CHAIN_ID = 48169;
-const RPC_URL = 'https://subnets.avax.network/goodtest/testnet/rpc';
+const CHAIN_ID_HEX = '0xBC29'; // 48169 in hex
 const NFT_STORAGE_API_KEY = 'b2b22ff0.916669fd4e6f42d5aab07621c9137b54';
 
 export default function ReflectionJournal() {
@@ -15,51 +15,50 @@ export default function ReflectionJournal() {
     try {
       if (!window.ethereum) return alert('Please install MetaMask');
 
-      setStatus('Connecting wallet...');
+      setStatus('🔗 Connecting wallet...');
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
       const { chainId } = await provider.getNetwork();
-    if (chainId !== CHAIN_ID) {
-  try {
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0xBC29' }] // 48169 in hex
-    });
-  } catch (switchError) {
-    // This error code means the chain hasn't been added to MetaMask
-    if (switchError.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: '0xBC29',
-            chainName: 'GOOD L1 Testnet',
-            rpcUrls: ['https://subnets.avax.network/goodtest/testnet/rpc'],
-            nativeCurrency: {
-              name: 'GOOD',
-              symbol: 'GOOD',
-              decimals: 18
-            },
-            blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
-          }]
-        });
-      } catch (addError) {
-        alert('Failed to add GOOD L1 Testnet to MetaMask.');
+      if (chainId !== CHAIN_ID) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: CHAIN_ID_HEX }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: CHAIN_ID_HEX,
+                  chainName: 'GOOD L1 Testnet',
+                  rpcUrls: ['https://subnets.avax.network/goodtest/testnet/rpc'],
+                  nativeCurrency: {
+                    name: 'GOOD',
+                    symbol: 'GOOD',
+                    decimals: 18
+                  },
+                  blockExplorerUrls: ['https://subnets.avax.network/goodtest/testnet/explorer']
+                }]
+              });
+            } catch (addError) {
+              alert('❌ Failed to add GOOD L1 Testnet to MetaMask.');
+              return;
+            }
+          } else {
+            alert('❌ Please switch to GOOD L1 Testnet manually.');
+            return;
+          }
+        }
       }
-    } else {
-      alert('Please switch to GOOD L1 Testnet (Chain ID: 48169).');
-    }
-  }
-}
 
-
-      // Upload to IPFS via nft.storage
-      setStatus('Uploading reflection to IPFS...');
+      setStatus('🌀 Uploading to IPFS...');
       const metadata = {
         name: 'Self-Reflection NFT',
         description: reflection,
-        image: 'https://bafybeibmqnx2q2d2xyv7gvf4lm2jh5ljxd3akz3xphcy3bw5zluqjhxwpq.ipfs.nftstorage.link/care.png' // placeholder image
+        image: 'https://bafybeibmqnx2q2d2xyv7gvf4lm2jh5ljxd3akz3xphcy3bw5zluqjhxwpq.ipfs.nftstorage.link/care.png'
       };
 
       const res = await fetch("https://api.nft.storage/upload", {
@@ -74,12 +73,11 @@ export default function ReflectionJournal() {
       const data = await res.json();
       const tokenURI = `https://${data.value.cid}.ipfs.nftstorage.link/`;
 
-      // Call mint on smart contract
       const abi = ["function mint(address to, string memory tokenURI) external"];
       const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
       const userAddress = await signer.getAddress();
 
-      setStatus('Minting your reflection...');
+      setStatus('🪞 Minting your reflection...');
       const tx = await contract.mint(userAddress, tokenURI);
       await tx.wait();
 
@@ -87,7 +85,7 @@ export default function ReflectionJournal() {
       setReflection('');
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error minting NFT. Check console.');
+      setStatus('❌ Error minting NFT. See console.');
     }
   };
 
